@@ -6,7 +6,7 @@ from discord.ext.commands import Cog, command
 logger = logging.getLogger(__name__)
 
 
-class GifsReact(Cog):
+class GifsReact(Cog, name="Reaction gifs"):
     """
     Gifs disponibles
     """
@@ -25,44 +25,77 @@ class GifsReact(Cog):
 
     @command()
     async def punch(self, ctx, *_):
+        """
+        👊
+        """
         await self.send_gif(ctx, "punch")
 
     @command()
     async def smirk(self, ctx, *_):
+        """
+        😏
+        """
         await self.send_gif(ctx, "smirk")
 
     @command()
     async def nanithefuck(self, ctx, *_):
+        """
+        🤨
+        """
         await self.send_gif(ctx, "nanithefuck")
 
     @command()
     async def lewd(self, ctx, *_):
+        """
+        🤭
+        """
         await self.send_gif(ctx, "lewd")
 
     @command()
     async def angry(self, ctx, *_):
+        """
+        😠
+        """
         await self.send_gif(ctx, "angry")
 
     @command()
     async def smoll(self, ctx, *_):
+        """
+        🍆
+        """
         await self.send_gif(ctx, "smoll")
 
     @command()
     async def rekt(self, ctx, *_):
+        """
+        🚮
+        """
         await self.send_gif(ctx, "rekt")
 
     @command()
     async def lick(self, ctx, *_):
+        """
+        👅
+        """
         await self.send_gif(ctx, "lick")
 
     @command()
     async def bite(self, ctx, *_):
+        """
+        🦖
+        """
         await self.send_gif(ctx, "bite")
 
     @command()
     async def pantsu(self, ctx, *_):
+        """
+        🍑
+        """
         await self.send_gif(ctx, "pantsu")
 
     @command()
     async def slap(self, ctx, *_):
+        """
+        💢
+        """
         await self.send_gif(ctx, "slap")
