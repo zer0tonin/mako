@@ -8,6 +8,8 @@ from discord.ext.commands import Bot
 from mako.gifs.database import GifsDatabase
 from mako.gifs.cog import GifsReact
 
+from mako.stats.cog import Stats
+
 logger = logging.getLogger(__name__)
 
 
@@ -17,8 +19,10 @@ async def start_bot(config):
         "redis://{}:{}".format(config["redis"]["host"], config["redis"]["port"])
     )
     gifs_database = GifsDatabase()
+
     bot = Bot(command_prefix="!", description="Bip Boop")
     bot.add_cog(GifsReact(bot, gifs_database))
+    bot.add_cog(Stats(bot, redis))
     await bot.start(config["token"])
 
 
