@@ -5,8 +5,8 @@ import yaml
 from aioredis import create_redis_pool
 from discord.ext.commands import Bot
 
-from mako.gifs_database import GifsDatabase
-from mako.discord.client import Mako
+from mako.gifs.database import GifsDatabase
+from mako.gifs.cog import GifsReact
 
 logger = logging.getLogger(__name__)
 
@@ -17,8 +17,8 @@ async def start_bot(config):
         "redis://{}:{}".format(config["redis"]["host"], config["redis"]["port"])
     )
     gifs_database = GifsDatabase()
-    bot = Bot(command_prefix="!")
-    bot.add_cog(Mako(bot, gifs_database, redis))
+    bot = Bot(command_prefix="!", description="Bip Boop")
+    bot.add_cog(GifsReact(bot, gifs_database))
     await bot.start(config["token"])
 
 

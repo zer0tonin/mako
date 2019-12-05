@@ -6,11 +6,14 @@ from discord.ext.commands import Cog, command
 logger = logging.getLogger(__name__)
 
 
-class Mako(Cog):
-    def __init__(self, bot, gifs_database, redis):
+class GifsReact(Cog):
+    """
+    Gifs disponibles
+    """
+
+    def __init__(self, bot, gifs_database):
         self.bot = bot
         self.gifs_database = gifs_database
-        self.redis = redis
 
     @Cog.listener()
     async def on_ready(self):
