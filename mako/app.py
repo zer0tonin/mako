@@ -9,6 +9,9 @@ from mako.gifs.database import GifsDatabase
 from mako.gifs.cog import GifsReact
 
 from mako.stats.cog import Stats
+from mako.stats.cleaner import Cleaner
+from mako.stats.counter import Counter
+from mako.stats.xp import XPAggregator
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +25,7 @@ async def start_bot(config):
 
     bot = Bot(command_prefix="!", description="Bip Boop")
     bot.add_cog(GifsReact(bot, gifs_database))
-    bot.add_cog(Stats(bot, redis))
+    bot.add_cog(Stats(bot, Counter(redis), Cleaner(redis), XPAggregator(redis)))
     await bot.start(config["token"])
 
 
