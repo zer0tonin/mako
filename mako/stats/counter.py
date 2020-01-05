@@ -31,7 +31,7 @@ class Counter:
     async def increment_reaction(self, message, count=1):
         creation_minute = message.created_at.strftime("%Y-%m-%dT%H:%M")
         minute_hash = "guilds:{}:users:{}:activity:{}".format(message.guild.id, message.author.id, creation_minute)
-        logger.debug("Incrementing {} hash for reactions".format(minute_hash))
+        logger.debug("Incrementing {} hash for reactions by {}".format(minute_hash, count))
         await self.redis.hincrby(minute_hash, "reactions", count)
 
     async def log_message(self, message):

@@ -40,7 +40,7 @@ class Stats(Cog):
 
     @Cog.listener()
     async def on_reaction_add(self, reaction, _):
-        if rection.guild is not None:
+        if reaction.message.guild is not None:
             await self.counter.log_reaction(reaction)
 
     #@command()
