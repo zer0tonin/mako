@@ -19,7 +19,8 @@ logger = logging.getLogger(__name__)
 async def start_bot(config):
     logger.info("Running the client")
     redis = await create_redis_pool(
-        "redis://{}:{}".format(config["redis"]["host"], config["redis"]["port"])
+        "redis://{}:{}".format(config["redis"]["host"], config["redis"]["port"]),
+        encoding='utf-8',
     )
     gifs_database = GifsDatabase()
 
