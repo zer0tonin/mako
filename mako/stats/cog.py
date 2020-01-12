@@ -30,15 +30,21 @@ class Stats(Cog):
         logger.info("connected to {}".format(guild.name))
         await self.cleaner.clean_guild(guild)
         await self.counter.add_guild(guild)
-        asyncio.gather(*[self.counter.parse_channel_history(channel) for channel in guild.channels if hasattr(channel, "history")])
+        asyncio.gather(
+            *[
+                self.counter.parse_channel_history(channel)
+                for channel in guild.channels
+                if hasattr(channel, "history")
+            ]
+        )
 
     @Cog.listener()
     async def on_message(self, message):
         if message.guild is not None:
             await self.counter.log_message(message)
 
-    #@Cog.listener()
-    #async def on_message_delete(self, message):
+    # @Cog.listener()
+    # async def on_message_delete(self, message):
     #    if message.guild is not None and hasattr(message.author, "id") and not message.author.bot:
     #        await self.redis.zincrby("XP:{}".format(message.guild.id), -1, message.author.id)
 
@@ -47,8 +53,8 @@ class Stats(Cog):
         if reaction.message.guild is not None:
             await self.counter.log_reaction(reaction)
 
-    #@command()
-    #async def top(self, ctx, *_):
+    # @command()
+    # async def top(self, ctx, *_):
     #    """
     #    Meilleurs shitposteurs
     #    """
@@ -59,7 +65,6 @@ class Stats(Cog):
     #        message = message + "\n{}. {} : {}".format(i, user.name, line[1])
     #    message = message + "\n```"
     #    return await ctx.send(message)
-
 
     @command()
     async def level(self, ctx, *_):

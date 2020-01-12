@@ -42,7 +42,9 @@ class XPAggregator:
             user_xp = await self.compute_user_xp(user_id, guild_id)
 
             xp_zset = "guilds:{}:xp".format(guild_id)
-            logger.debug("Writing {} for user: {} by {}".format(xp_zset, user_id, user_xp))
+            logger.debug(
+                "Writing {} for user: {} by {}".format(xp_zset, user_id, user_xp)
+            )
             await self.redis.zincrby(xp_zset, user_xp, user_id)
 
     async def update_guilds_xp(self):

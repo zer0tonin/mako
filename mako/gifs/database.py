@@ -14,4 +14,4 @@ class GifsDatabase:
 
     def get_random(self, category):
         available_gifs = self.gifs_map[category]
-        return random.choice(available_gifs)
+        return random.choice(available_gifs) # nosec
