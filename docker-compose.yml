@@ -1,7 +1,9 @@
 version: '3'
 services:
   app: &app
-    build: .
+    image: app
+    build:
+      dockerfile: Dockerfile
     environment:
       - PYTHONPATH=/usr/src/app
     volumes:
@@ -15,37 +17,6 @@ services:
     image: redis:5.0.7
     networks:
       - ns
-
-  format:
-    <<: *app
-    command: black --target-version py37 mako
-    depends_on: []
-
-  style:
-    <<: *app
-    command: black --target-version py37 --check mako
-    depends_on: []
-
-  complexity:
-    <<: *app
-    command: xenon --ignore "tests" --max-absolute A --max-modules A --max-average A mako
-    working_dir: /usr/src/app/mako
-    depends_on: []
-
-  test:
-    <<: *app
-    command: pytest -s mako
-    depends_on: []
-
-  security-sast:
-    <<: *app
-    command: bandit -r mako -x test
-    depends_on: []
-
-  type:
-    <<: *app
-    command: mypy mako --ignore-missing-import
-    depends_on: []
 
 networks:
   ns:
