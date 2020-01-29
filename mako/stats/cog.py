@@ -68,10 +68,9 @@ class Stats(Cog):
 
     @command()
     async def level(self, ctx, *_):
-        result = await self.xp_aggregator.get_user_xp(ctx.author, ctx.guild)
-        if result:
-            await ctx.send(result)
+        level = await self.xp_aggregator.get_user_level(ctx.author, ctx.guild)
+        await ctx.send("Level {}: {}".format(level[0], level[1]))
 
     async def update_xp(self):
         logger.info("XP loop")
-        await self.xp_aggregator.update_guilds_xp()
+        await self.xp_aggregator.update_guilds()
