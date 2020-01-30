@@ -32,15 +32,24 @@ class XPAggregator:
         return result
 
     async def get_user_xp(self, user, guild):
+        """
+        Returns the user xp from the guilds:{}:xp zset
+        """
         xp_zset = "guilds:{}:xp".format(guild.id)
         return await self.redis.zscore(xp_zset, user.id)
 
     async def get_user_level(self, user_id, guild):
+        """
+        Returns a tuple with level and level name based on the guilds:{}:levels zset and config
+        """
         level_zset = "guilds:{}:levels".format(guild.id)
         level = await self.redis.zscore(level_zset, user_id)
         return (level, self.levels[level])
 
     async def compute_user_xp(self, user_id, guild_id):
+        """
+        Uses the activity timeframe stored in guilds:{}:users:{}:activity to compute XP for a single user
+        """
         activity_set = "guilds:{}:users:{}:activity".format(guild_id, user_id)
         xp_count = 0
 
@@ -63,6 +72,9 @@ class XPAggregator:
         return xp_count
 
     async def update_guild_xp(self, guild_id):
+        """
+        Stores the XP in the guilds:{}:xp zset
+        """
         users_set = "guilds:{}:users".format(guild_id)
 
         logger.debug("Accessing {}".format(users_set))
@@ -76,6 +88,9 @@ class XPAggregator:
             await self.redis.zincrby(xp_zset, user_xp, user_id)
 
     async def update_guilds_level(self, guild_id):
+        """
+        Stores the user levels in a guilds:{}:levels zset
+        """
         users_set = "guilds:{}:users".format(guild_id)
 
         logger.debug("Accessing {}".format(users_set))

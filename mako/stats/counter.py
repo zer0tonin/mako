@@ -9,15 +9,24 @@ class Counter:
         self.redis = redis
 
     async def add_guild(self, guild):
+        """
+        Adds a guild to the guilds set
+        """
         logger.debug("Creating guilds set for: {}#{}".format(guild.name, guild.id))
         await self.redis.sadd("guilds", guild.id)
 
     async def add_user(self, user):
+        """
+        Adds an user to the guilds:{}:users set
+        """
         guild_set = "guilds:{}:users".format(user.guild.id)
         logger.debug("Creating {} set for: {}#{}".format(guild_set, user.name, user.id))
         await self.redis.sadd(guild_set, user.id)
 
     async def add_activity(self, message):
+        """
+        Adds an activity timeframe to the guilds:{}:users:{}:activity
+        """
         creation_minute = message.created_at.strftime("%Y-%m-%dT%H:%M")
         user_set = "guilds:{}:users:{}:activity".format(
             message.guild.id, message.author.id
@@ -26,6 +35,9 @@ class Counter:
         await self.redis.sadd(user_set, creation_minute)
 
     async def increment_message(self, message):
+        """
+        Increments the message count in an activity timeframe in the hash guilds:{}:users:{}:activity
+        """
         creation_minute = message.created_at.strftime("%Y-%m-%dT%H:%M")
         minute_hash = "guilds:{}:users:{}:activity:{}".format(
             message.guild.id, message.author.id, creation_minute
@@ -34,6 +46,9 @@ class Counter:
         await self.redis.hincrby(minute_hash, "messages", 1)
 
     async def increment_reaction(self, message, count=1):
+        """
+        Increments the reaction count in an activity timeframe in the hash guilds:{}:users:{}:activity:{}
+        """
         creation_minute = message.created_at.strftime("%Y-%m-%dT%H:%M")
         minute_hash = "guilds:{}:users:{}:activity:{}".format(
             message.guild.id, message.author.id, creation_minute
@@ -44,6 +59,9 @@ class Counter:
         await self.redis.hincrby(minute_hash, "reactions", count)
 
     async def log_message(self, message):
+        """
+        Adds a new message to a guild, creating a new user and activity timeframe if needed
+        """
         if hasattr(message.author, "id") and not message.author.bot:
             asyncio.gather(
                 self.add_user(message.author),
@@ -52,6 +70,9 @@ class Counter:
             )
 
     async def log_reaction(self, reaction):
+        """
+        Adds a new reaction to a guild, creating a new user and activity timeframe if needed
+        """
         message = reaction.message
         if hasattr(message.author, "id") and not message.author.bot:
             asyncio.gather(
@@ -61,6 +82,9 @@ class Counter:
             )
 
     async def log_full_message(self, message):
+        """
+        Adds a new message with reactions to the guild, creating a new uer and activity timeframe if needed
+        """
         if hasattr(message.author, "id") and not message.author.bot:
             asyncio.gather(
                 self.add_user(message.author),
