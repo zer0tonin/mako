@@ -26,7 +26,7 @@ async def start_bot(config):
 
     bot = Bot(command_prefix="!", description="Bip Boop")
     bot.add_cog(GifsReact(bot, gifs_database))
-    bot.add_cog(Stats(bot, Counter(redis), Cleaner(redis), XPAggregator(redis, config["levels"])))
+    bot.add_cog(Stats(bot, Counter(redis), Cleaner(redis), XPAggregator(redis, config["levels"]), config["xp_job_delay"]))
     await bot.start(config["token"])
 
 

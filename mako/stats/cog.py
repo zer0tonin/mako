@@ -13,13 +13,13 @@ class Stats(Cog):
     Statistiques d'activité
     """
 
-    def __init__(self, bot, counter, cleaner, xp_aggregator):
+    def __init__(self, bot, counter, cleaner, xp_aggregator, delay):
         self.bot = bot
         self.counter = counter
         self.cleaner = cleaner
         self.xp_aggregator = xp_aggregator
 
-        xp_loop = loop(seconds=5)(self.update_xp)
+        xp_loop = loop(seconds=delay)(self.update_xp)
         xp_loop.start()
 
     @Cog.listener()
@@ -53,23 +53,32 @@ class Stats(Cog):
         if reaction.message.guild is not None:
             await self.counter.log_reaction(reaction)
 
-    # @command()
-    # async def top(self, ctx, *_):
-    #    """
-    #    Meilleurs shitposteurs
-    #    """
-    #    top = await self.redis.zrevrange("XP:{}".format(ctx.guild.id), 0, 10, withscores=True)
-    #    message = "```"
-    #    for i, line in enumerate(top):
-    #        user = self.bot.get_user(int(line[0]))
-    #        message = message + "\n{}. {} : {}".format(i, user.name, line[1])
-    #    message = message + "\n```"
-    #    return await ctx.send(message)
+    @command()
+    async def rank(self, ctx, *_):
+        """
+        Top 10 shitposters
+        """
+        top = await self.xp_aggregator.get_rank(ctx.guild)
+        message = "```"
+        for i, line in enumerate(top):
+            user = self.bot.get_user(int(line[0]))
+            message = message + "\n{}. {}: Level {} : {} : {} XP".format(i + 1, user.name, line[2], line[3], line[1])
+        message = message + "\n```"
+        return await ctx.send(message)
 
     @command()
     async def level(self, ctx, *_):
-        level = await self.xp_aggregator.get_user_level(ctx.author, ctx.guild)
-        await ctx.send("Level {}: {}".format(level[0], level[1]))
+        """
+        Level & XP
+        """
+        level_task = asyncio.create_task(self.xp_aggregator.get_user_level(ctx.author.id, ctx.guild))
+        xp_task = asyncio.create_task(self.xp_aggregator.get_user_xp(ctx.author, ctx.guild))
+
+        await asyncio.gather(level_task, xp_task)
+        level = level_task.result()
+        user_xp = xp_task.result()
+
+        await ctx.send("```Level {}: {} ({} XP)```".format(level[0], level[1], user_xp))
 
     async def update_xp(self):
         logger.info("XP loop")

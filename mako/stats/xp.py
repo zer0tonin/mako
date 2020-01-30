@@ -3,28 +3,42 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def compute_user_level(user_xp):
+    power = 1
+    while user_xp >= 2 ** power:
+        power = power + 1
+    return power
+
 
 class XPAggregator:
     def __init__(self, redis, levels):
         self.redis = redis
         self.levels = levels
 
+    async def get_rank(self, guild):
+        xp_zset = "guilds:{}:xp".format(guild.id)
+        top_xp = await self.redis.zrevrange(xp_zset, 0, 10, withscores=True)
+
+        level_tasks = []
+        for line in top_xp:
+            level_tasks.append(asyncio.create_task(self.get_user_level(line[0], guild)))
+        await asyncio.gather(*level_tasks)
+
+        result = []
+        for i, level_task in enumerate(level_tasks):
+            level = level_task.result()
+            result.append((top_xp[i][0], top_xp[i][1], level[0], level[1]))
+
+        return result
+
     async def get_user_xp(self, user, guild):
         xp_zset = "guilds:{}:xp".format(guild.id)
         return await self.redis.zscore(xp_zset, user.id)
 
-    async def get_user_level(self, user, guild):
+    async def get_user_level(self, user_id, guild):
         level_zset = "guilds:{}:levels".format(guild.id)
-        level = await self.redis.zscore(level_zset, user.id)
+        level = await self.redis.zscore(level_zset, user_id)
         return (level, self.levels[level])
-
-    @staticmethod
-    def compute_user_level(user_xp):
-        power = 0
-        while user_xp > 0:
-            power = power + 1
-            user_xp = user_xp - (2 ** power)
-        return power
 
     async def compute_user_xp(self, user_id, guild_id):
         activity_set = "guilds:{}:users:{}:activity".format(guild_id, user_id)
@@ -70,7 +84,7 @@ class XPAggregator:
             logger.debug("Accessing {} for user: {}".format(xp_zset, user_id))
             user_xp = await self.redis.zscore(xp_zset, user_id)
 
-            level = self.compute_user_level(user_xp)
+            level = compute_user_level(user_xp)
             level_zset = "guilds:{}:levels".format(guild_id)
 
             logger.debug("Accessing {} for user: {}".format(level_zset, user_id))
