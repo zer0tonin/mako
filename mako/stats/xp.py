@@ -58,16 +58,13 @@ class XPAggregator:
             timeframe_hash = activity_set + ":{}".format(activity)
             logger.debug("Accessing {} for user: {}".format(timeframe_hash, user_id))
 
-            visited = await self.redis.hget(timeframe_hash, "xp_visited")
-            if not visited:
-                xp_count = xp_count + 1
+            xp_count = xp_count + 1
 
-                reactions = await self.redis.hget(timeframe_hash, "reactions")
-                if reactions:
-                    logger.debug("Reaction count: {}".format(int(reactions)))
-                    xp_count = xp_count + int(reactions)
+            reactions = await self.redis.hget(timeframe_hash, "reactions")
+            if reactions:
+                logger.debug("Reaction count: {}".format(int(reactions)))
+                xp_count = xp_count + int(reactions)
 
-                await self.redis.hset(timeframe_hash, "xp_visited", "1")
 
         return xp_count
 
@@ -85,7 +82,7 @@ class XPAggregator:
             logger.debug(
                 "Writing {} for user: {} by {}".format(xp_zset, user_id, user_xp)
             )
-            await self.redis.zincrby(xp_zset, user_xp, user_id)
+            await self.redis.zadd(xp_zset, user_xp, user_id)
 
     async def update_guilds_level(self, guild_id):
         """
