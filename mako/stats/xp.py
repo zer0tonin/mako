@@ -3,6 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def compute_user_level(user_xp):
     power = 1
     while user_xp >= 2 ** power:
@@ -65,7 +66,6 @@ class XPAggregator:
                 logger.debug("Reaction count: {}".format(int(reactions)))
                 xp_count = xp_count + int(reactions)
 
-
         return xp_count
 
     async def update_guild_xp(self, guild_id):
@@ -104,7 +104,11 @@ class XPAggregator:
 
             if not previous_level or level > previous_level:
                 logger.debug("User {} is level {}".format(user_id, level))
-                logger.debug("Writing {} for user: {} with value {}".format(level_zset, user_id, level))
+                logger.debug(
+                    "Writing {} for user: {} with value {}".format(
+                        level_zset, user_id, level
+                    )
+                )
                 await self.redis.zadd(level_zset, level, user_id)
 
     async def update_guilds(self):

@@ -67,7 +67,9 @@ class Stats(Cog):
         message = "```"
         for i, line in enumerate(top):
             user = self.bot.get_user(int(line[0]))
-            message = message + "\n{}. {}: Level {} : {} : {} XP".format(i + 1, user.name, line[2], line[3], line[1])
+            message = message + "\n{}. {}: Level {} : {} : {} XP".format(
+                i + 1, user.name, line[2], line[3], line[1]
+            )
         message = message + "\n```"
         return await ctx.send(message)
 
@@ -76,8 +78,12 @@ class Stats(Cog):
         """
         Level & XP
         """
-        level_task = asyncio.create_task(self.xp_aggregator.get_user_level(ctx.author.id, ctx.guild))
-        xp_task = asyncio.create_task(self.xp_aggregator.get_user_xp(ctx.author, ctx.guild))
+        level_task = asyncio.create_task(
+            self.xp_aggregator.get_user_level(ctx.author.id, ctx.guild)
+        )
+        xp_task = asyncio.create_task(
+            self.xp_aggregator.get_user_xp(ctx.author, ctx.guild)
+        )
 
         await asyncio.gather(level_task, xp_task)
         level = level_task.result()

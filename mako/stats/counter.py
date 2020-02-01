@@ -63,17 +63,18 @@ class Counter:
         Decrements a reaction counter from an activity timeframe if it exists
         """
         creation_minute = message.created_at.strftime("%Y-%m-%dT%H:%M")
-        activity_set = "guilds:{}:users:{}:activity".format(message.guild.id, message.author.id)
+        activity_set = "guilds:{}:users:{}:activity".format(
+            message.guild.id, message.author.id
+        )
         minute_hash = "guilds:{}:users:{}:activity:{}".format(
             message.guild.id, message.author.id, creation_minute
         )
-        logger.debug(
-            "Checking {} set for activity {}".format(activity_set, count)
-        )
-        if await self.redis.sismember(activity_set, creation_minute) and await self.redis.hget(minute_hash, "reactions") != "0":
-            logger.debug(
-                "Decrementing {} hash for reactions".format(minute_hash)
-            )
+        logger.debug("Checking {} set for activity {}".format(activity_set, count))
+        if (
+            await self.redis.sismember(activity_set, creation_minute)
+            and await self.redis.hget(minute_hash, "reactions") != "0"
+        ):
+            logger.debug("Decrementing {} hash for reactions".format(minute_hash))
             await self.redis.hincrby(minute_hash, "reactions", -1)
 
     async def decrement_message(self, message, count=1):
@@ -81,17 +82,18 @@ class Counter:
         Decrements a message counter from an activity timeframe if it exists
         """
         creation_minute = message.created_at.strftime("%Y-%m-%dT%H:%M")
-        activity_set = "guilds:{}:users:{}:activity".format(message.guild.id, message.author.id)
+        activity_set = "guilds:{}:users:{}:activity".format(
+            message.guild.id, message.author.id
+        )
         minute_hash = "guilds:{}:users:{}:activity:{}".format(
             message.guild.id, message.author.id, creation_minute
         )
-        logger.debug(
-            "Checking {} set for activity {}".format(activity_set, count)
-        )
-        if await self.redis.sismember(activity_set, creation_minute) and await self.redis.hget(minute_hash, "messages") != "0":
-            logger.debug(
-                "Decrementing {} hash for messages".format(minute_hash)
-            )
+        logger.debug("Checking {} set for activity {}".format(activity_set, count))
+        if (
+            await self.redis.sismember(activity_set, creation_minute)
+            and await self.redis.hget(minute_hash, "messages") != "0"
+        ):
+            logger.debug("Decrementing {} hash for messages".format(minute_hash))
             await self.redis.hincrby(minute_hash, "messages", -1)
 
     async def log_message(self, message):
