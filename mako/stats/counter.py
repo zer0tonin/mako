@@ -58,6 +58,42 @@ class Counter:
         )
         await self.redis.hincrby(minute_hash, "reactions", count)
 
+    async def decrement_reaction(self, message, count=1):
+        """
+        Decrements a reaction counter from an activity timeframe if it exists
+        """
+        creation_minute = message.created_at.strftime("%Y-%m-%dT%H:%M")
+        activity_set = "guilds:{}:users:{}:activity".format(message.guild.id, message.author.id)
+        minute_hash = "guilds:{}:users:{}:activity:{}".format(
+            message.guild.id, message.author.id, creation_minute
+        )
+        logger.debug(
+            "Checking {} set for activity {}".format(activity_set, count)
+        )
+        if await self.redis.sismember(activity_set, creation_minute) and await self.redis.hget(minute_hash, "reactions") != "0":
+            logger.debug(
+                "Decrementing {} hash for reactions".format(minute_hash)
+            )
+            await self.redis.hincrby(minute_hash, "reactions", -1)
+
+    async def decrement_message(self, message, count=1):
+        """
+        Decrements a message counter from an activity timeframe if it exists
+        """
+        creation_minute = message.created_at.strftime("%Y-%m-%dT%H:%M")
+        activity_set = "guilds:{}:users:{}:activity".format(message.guild.id, message.author.id)
+        minute_hash = "guilds:{}:users:{}:activity:{}".format(
+            message.guild.id, message.author.id, creation_minute
+        )
+        logger.debug(
+            "Checking {} set for activity {}".format(activity_set, count)
+        )
+        if await self.redis.sismember(activity_set, creation_minute) and await self.redis.hget(minute_hash, "messages") != "0":
+            logger.debug(
+                "Decrementing {} hash for messages".format(minute_hash)
+            )
+            await self.redis.hincrby(minute_hash, "messages", -1)
+
     async def log_message(self, message):
         """
         Adds a new message to a guild, creating a new user and activity timeframe if needed
@@ -68,6 +104,14 @@ class Counter:
                 self.add_activity(message),
                 self.increment_message(message),
             )
+
+    async def remove_message(self, message):
+        """
+        Removes a message from a guild, assuming the user and activity timeframe already exists
+        TODO: need to handle the reaction associated with it
+        """
+        if hasattr(message.author, "id") and not message.author.bot:
+            await self.decrement_message(message)
 
     async def log_reaction(self, reaction):
         """
@@ -80,6 +124,14 @@ class Counter:
                 self.add_activity(message),
                 self.increment_reaction(message),
             )
+
+    async def remove_reaction(self, reaction):
+        """
+        Removes a message from a guild, assuming the user and activity timeframe already exists
+        """
+        message = reaction.message
+        if hasattr(message.author, "id") and not message.author.bot:
+            await self.decrement_reaction(message)
 
     async def log_full_message(self, message):
         """

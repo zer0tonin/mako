@@ -43,15 +43,20 @@ class Stats(Cog):
         if message.guild is not None:
             await self.counter.log_message(message)
 
-    # @Cog.listener()
-    # async def on_message_delete(self, message):
-    #    if message.guild is not None and hasattr(message.author, "id") and not message.author.bot:
-    #        await self.redis.zincrby("XP:{}".format(message.guild.id), -1, message.author.id)
+    @Cog.listener()
+    async def on_message_delete(self, message):
+        if message.guild is not None:
+            await self.counter.remove_message(message)
 
     @Cog.listener()
     async def on_reaction_add(self, reaction, _):
         if reaction.message.guild is not None:
             await self.counter.log_reaction(reaction)
+
+    @Cog.listener()
+    async def on_reaction_remove(self, reaction, _):
+        if reaction.message.guild is not None:
+            await self.counter.remove_reaction(reaction)
 
     @command()
     async def rank(self, ctx, *_):
