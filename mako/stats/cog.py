@@ -113,6 +113,8 @@ class Stats(Cog):
         for notification in notifications:
             channel = self.get_bot_channel(int(notification[0]))
             user = self.bot.get_user(int(notification[1]))
-            message_tasks.append(asyncio.create_task(channel.send("{} level up!".format(user.name))))
+            message_tasks.append(
+                asyncio.create_task(channel.send("{} level up!".format(user.name)))
+            )
 
         asyncio.gather(*message_tasks)

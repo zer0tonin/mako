@@ -69,7 +69,9 @@ class Counter:
         minute_hash = "guilds:{}:users:{}:activity:{}".format(
             message.guild.id, message.author.id, creation_minute
         )
-        logger.debug("Checking {} set for activity {}".format(activity_set, minute_hash))
+        logger.debug(
+            "Checking {} set for activity {}".format(activity_set, minute_hash)
+        )
         if (
             await self.redis.sismember(activity_set, creation_minute)
             and await self.redis.hget(minute_hash, "reactions") != "0"
@@ -88,7 +90,9 @@ class Counter:
         minute_hash = "guilds:{}:users:{}:activity:{}".format(
             message.guild.id, message.author.id, creation_minute
         )
-        logger.debug("Checking {} set for activity {}".format(activity_set, minute_hash))
+        logger.debug(
+            "Checking {} set for activity {}".format(activity_set, minute_hash)
+        )
         if (
             await self.redis.sismember(activity_set, creation_minute)
             and await self.redis.hget(minute_hash, "messages") != "0"
