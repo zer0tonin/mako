@@ -12,6 +12,7 @@ from mako.stats.cog import Stats
 from mako.stats.cleaner import Cleaner
 from mako.stats.counter import Counter
 from mako.stats.xp import XPAggregator
+from mako.stats.notifier import Notifier
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +33,7 @@ async def start_bot(config):
             Counter(redis),
             Cleaner(redis),
             XPAggregator(redis, config["levels"]),
+            Notifier(redis),
             config["xp_job_delay"],
         )
     )

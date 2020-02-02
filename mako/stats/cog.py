@@ -13,14 +13,18 @@ class Stats(Cog):
     Statistiques d'activité
     """
 
-    def __init__(self, bot, counter, cleaner, xp_aggregator, delay):
+    def __init__(self, bot, counter, cleaner, xp_aggregator, notifier, delay):
         self.bot = bot
         self.counter = counter
         self.cleaner = cleaner
         self.xp_aggregator = xp_aggregator
+        self.notifier = notifier
 
         xp_loop = loop(seconds=delay)(self.update_xp)
         xp_loop.start()
+
+        notify_loop = loop(seconds=delay)(self.notify_levels)
+        notify_loop.start()
 
     @Cog.listener()
     async def on_guild_available(self, guild):
@@ -94,3 +98,21 @@ class Stats(Cog):
     async def update_xp(self):
         logger.info("XP loop")
         await self.xp_aggregator.update_guilds()
+
+    def get_bot_channel(self, guild_id):
+        guild = self.bot.get_guild(guild_id)
+        for channel in guild.channels:
+            if "bot" in channel.name:
+                return channel
+
+    async def notify_levels(self):
+        logger.info("Notify loop")
+        notifications = await self.notifier.notify_guilds()
+
+        message_tasks = []
+        for notification in notifications:
+            channel = self.get_bot_channel(int(notification[0]))
+            user = self.bot.get_user(int(notification[1]))
+            message_tasks.append(asyncio.create_task(channel.send("{} level up!".format(user.name))))
+
+        asyncio.gather(*message_tasks)
