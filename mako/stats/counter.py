@@ -58,7 +58,7 @@ class Counter:
         )
         await self.redis.hincrby(minute_hash, "reactions", count)
 
-    async def decrement_reaction(self, message, count=1):
+    async def decrement_reaction(self, message, count=-1):
         """
         Decrements a reaction counter from an activity timeframe if it exists
         """
@@ -69,15 +69,15 @@ class Counter:
         minute_hash = "guilds:{}:users:{}:activity:{}".format(
             message.guild.id, message.author.id, creation_minute
         )
-        logger.debug("Checking {} set for activity {}".format(activity_set, count))
+        logger.debug("Checking {} set for activity {}".format(activity_set, minute_hash))
         if (
             await self.redis.sismember(activity_set, creation_minute)
             and await self.redis.hget(minute_hash, "reactions") != "0"
         ):
             logger.debug("Decrementing {} hash for reactions".format(minute_hash))
-            await self.redis.hincrby(minute_hash, "reactions", -1)
+            await self.redis.hincrby(minute_hash, "reactions", count)
 
-    async def decrement_message(self, message, count=1):
+    async def decrement_message(self, message):
         """
         Decrements a message counter from an activity timeframe if it exists
         """
@@ -88,7 +88,7 @@ class Counter:
         minute_hash = "guilds:{}:users:{}:activity:{}".format(
             message.guild.id, message.author.id, creation_minute
         )
-        logger.debug("Checking {} set for activity {}".format(activity_set, count))
+        logger.debug("Checking {} set for activity {}".format(activity_set, minute_hash))
         if (
             await self.redis.sismember(activity_set, creation_minute)
             and await self.redis.hget(minute_hash, "messages") != "0"
@@ -110,10 +110,12 @@ class Counter:
     async def remove_message(self, message):
         """
         Removes a message from a guild, assuming the user and activity timeframe already exists
-        TODO: need to handle the reaction associated with it
         """
         if hasattr(message.author, "id") and not message.author.bot:
-            await self.decrement_message(message)
+            asyncio.gather(
+                self.decrement_message(message),
+                self.decrement_reaction(message, -1 * len(message.reactions)),
+            )
 
     async def log_reaction(self, reaction):
         """
