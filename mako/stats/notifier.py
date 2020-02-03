@@ -18,14 +18,16 @@ class Notifier:
         return result
 
     async def notify_guild(self, guild_id):
-        notify_set = "guilds:{}:notify".format(guild_id)
+        notify_list = "guilds:{}:notify".format(guild_id)
         level_zset = "guilds:{}:levels".format(guild_id)
 
         result = []
-        logger.debug("Scanning {} set".format(notify_set))
-        async for user_id in self.redis.isscan(notify_set):
+        logger.debug("Popping {} queue".format(notify_list))
+        user_id = await self.redis.lpop(notify_list)
+        while user_id is not None:
             logger.debug("Accessing {} zset for user: {}".format(level_zset, user_id))
             level = await self.redis.zscore(level_zset, user_id)
             result.append((guild_id, user_id, level))
+            user_id = await self.redis.lpop(notify_list)
 
         return result
