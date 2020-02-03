@@ -34,7 +34,7 @@ async def start_bot(config):
             Cleaner(redis),
             XPAggregator(redis, config["levels"]),
             Notifier(redis),
-            config["xp_job_delay"],
+            config,
         )
     )
     await bot.start(config["token"])

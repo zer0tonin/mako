@@ -13,17 +13,18 @@ class Stats(Cog):
     Statistiques d'activité
     """
 
-    def __init__(self, bot, counter, cleaner, xp_aggregator, notifier, delay):
+    def __init__(self, bot, counter, cleaner, xp_aggregator, notifier, config):
         self.bot = bot
         self.counter = counter
         self.cleaner = cleaner
         self.xp_aggregator = xp_aggregator
         self.notifier = notifier
+        self.spam_channel = config["spam_channel"]
 
-        xp_loop = loop(seconds=delay)(self.update_xp)
+        xp_loop = loop(seconds=config["delays"]["xp"])(self.update_xp)
         xp_loop.start()
 
-        notify_loop = loop(seconds=delay)(self.notify_levels)
+        notify_loop = loop(seconds=config["delays"]["notify"])(self.notify_levels)
         notify_loop.start()
 
     @Cog.listener()
@@ -102,8 +103,9 @@ class Stats(Cog):
     def get_bot_channel(self, guild_id):
         guild = self.bot.get_guild(guild_id)
         for channel in guild.channels:
-            if "bot" in channel.name:
+            if self.spam_channel in channel.name:
                 return channel
+        raise ValueError("No proper spam channel")
 
     async def notify_levels(self):
         logger.info("Notify loop")

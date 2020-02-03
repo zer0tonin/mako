@@ -23,4 +23,7 @@ levels:
   18: "Hikikomori confirmé"
   19: "Hikikomori transcendé"
   20: "Hikikomori ascensionné"
-xp_job_delay: 5
+delays:
+  xp: 5
+  notify: 5
+spam_channel: "bot"
