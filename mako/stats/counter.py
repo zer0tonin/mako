@@ -1,6 +1,8 @@
 import asyncio
 import logging
 
+from discord.errors import Forbidden
+
 logger = logging.getLogger(__name__)
 
 
@@ -155,5 +157,8 @@ class Counter:
             )
 
     async def parse_channel_history(self, channel):
-        async for message in channel.history(limit=None):
-            await self.log_full_message(message)
+        try:
+            async for message in channel.history(limit=None):
+                await self.log_full_message(message)
+        except Forbidden:
+            logger.error("Forbidden channel")

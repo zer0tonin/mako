@@ -1,5 +1,5 @@
 token: my-bot-token
-logging_level: DEBUG
+logging_level: INFO
 redis:
   host: redis
   port: 6379
@@ -24,6 +24,6 @@ levels:
   19: "Hikikomori transcendé"
   20: "Hikikomori ascensionné"
 delays:
-  xp: 5
+  xp: 10
   notify: 5
 spam_channel: "bot"

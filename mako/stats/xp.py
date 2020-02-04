@@ -18,7 +18,7 @@ class XPAggregator:
 
     async def get_rank(self, guild):
         xp_zset = "guilds:{}:xp".format(guild.id)
-        top_xp = await self.redis.zrevrange(xp_zset, 0, 10, withscores=True)
+        top_xp = await self.redis.zrevrange(xp_zset, 0, 9, withscores=True)
 
         level_tasks = []
         for line in top_xp:
