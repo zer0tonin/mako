@@ -13,9 +13,9 @@ class Cleaner:
         logger.info("Cleaning data for guild: {}#{}".format(guild.name, guild.id))
         users_set = "guilds:{}:users".format(guild.id)
         level_zset = "guilds:{}:levels".format(guild.id)
-        xp_zset = "guilds:{}:xp".format(guild_id)
-        notify_list = "guilds:{}:notify".format(guild_id)
-        to_delete = [users_set, level_zset, xp_zset]
+        xp_zset = "guilds:{}:xp".format(guild.id)
+        notify_list = "guilds:{}:notify".format(guild.id)
+        to_delete = [users_set, level_zset, xp_zset, notify_list]
 
         async for user in self.redis.isscan(users_set):
             activity_set = "{}:{}:activity".format(users_set, user)
