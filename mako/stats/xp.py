@@ -96,6 +96,9 @@ class XPAggregator:
             logger.debug("Accessing {} for user: {}".format(xp_zset, user_id))
             user_xp = await self.redis.zscore(xp_zset, user_id)
 
+            if not user_xp:
+                continue
+
             level = compute_user_level(user_xp)
             level_zset = "guilds:{}:levels".format(guild_id)
             notify_list = "guilds:{}:notify".format(guild_id)
