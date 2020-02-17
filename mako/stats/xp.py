@@ -103,17 +103,22 @@ class XPAggregator:
             logger.debug("Accessing {} for user: {}".format(level_zset, user_id))
             previous_level = await self.redis.zscore(level_zset, user_id)
 
-            if not previous_level or level > previous_level:
-                logger.debug("User {} is level {}".format(user_id, level))
-                logger.debug(
-                    "Writing {} and {} for user: {} with value {}".format(
-                        level_zset, notify_list, user_id, level
-                    )
-                )
+            if not previous_level:
+                await self.set_level(level_zset, user_id, level)
+            elif level > previous_level:
                 asyncio.gather(
-                    self.redis.zadd(level_zset, level, user_id),
+                    self.set_level(level_zset, user_id, level),
                     self.redis.lpush(notify_list, user_id),
                 )
+
+    async def set_level(self, level_zset, user_id, level):
+        logger.debug("User {} is level {}".format(user_id, level))
+        logger.debug(
+            "Writing {} and for user: {} with value {}".format(
+                level_zset, user_id, level
+            )
+        )
+        await self.redis.zadd(level_zset, level, user_id)
 
     async def update_guilds(self):
         logger.info("Accessing guilds")

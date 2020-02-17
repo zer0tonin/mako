@@ -23,7 +23,9 @@ class Counter:
         """
         if hasattr(user, "guild"):
             guild_set = "guilds:{}:users".format(user.guild.id)
-            logger.debug("Creating {} set for: {}#{}".format(guild_set, user.name, user.id))
+            logger.debug(
+                "Creating {} set for: {}#{}".format(guild_set, user.name, user.id)
+            )
             await self.redis.sadd(guild_set, user.id)
 
     async def add_activity(self, message):
