@@ -12,17 +12,17 @@ levels:
   7: "Normie"
   8: "Normie éclairé"
   9: "Normie transcendé"
-  10: "Normie ascensionné"
+  10: "Normie exalté"
   11: "Weeb refoulé"
   12: "Weeb assumé"
   13: "Weeb éclairé"
   14: "Weeb transcendé"
-  15: "Weeb ascensionné"
+  15: "Weeb exalté"
   16: "Hikikomori suspecté"
   17: "Hikikomori auto-diagnostiqué"
   18: "Hikikomori confirmé"
   19: "Hikikomori transcendé"
-  20: "Hikikomori ascensionné"
+  20: "Hikikomori exalté"
 delays:
   xp: 10
   notify: 5
