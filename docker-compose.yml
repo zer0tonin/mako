@@ -12,7 +12,10 @@ services:
       - ns
 
   redis:
-    image: redis:5.0.7
+    image: redis:5.0.9
+    command: redis-server --appendonly yes
+    volumes:
+      - ./data:/data
     networks:
       - ns
 
