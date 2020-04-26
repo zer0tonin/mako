@@ -14,8 +14,16 @@ class Counter:
         """
         Adds a guild to the guilds set
         """
-        logger.debug("Creating guilds set for: {}#{}".format(guild.name, guild.id))
-        await self.redis.sadd("guilds", guild.id)
+        if not await self.redis.sismember("guilds", guild.id):
+            logger.info("Creating guilds set for: {}#{}".format(guild.name, guild.id))
+            await self.redis.sadd("guilds", guild.id)
+            asyncio.gather(
+                *[
+                    self.parse_channel_history(channel)
+                    for channel in guild.channels
+                    if hasattr(channel, "history")
+                ]
+            )
 
     async def add_user(self, user):
         """

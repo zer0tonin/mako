@@ -9,7 +9,6 @@ from mako.gifs.database import GifsDatabase
 from mako.gifs.cog import GifsReact
 
 from mako.stats.cog import Stats
-from mako.stats.cleaner import Cleaner
 from mako.stats.counter import Counter
 from mako.stats.xp import XPAggregator
 from mako.stats.notifier import Notifier
@@ -31,7 +30,6 @@ async def start_bot(config):
         Stats(
             bot,
             Counter(redis),
-            Cleaner(redis),
             XPAggregator(redis, config["levels"]),
             Notifier(redis),
             config,

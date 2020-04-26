@@ -13,10 +13,9 @@ class Stats(Cog):
     Statistiques d'activité
     """
 
-    def __init__(self, bot, counter, cleaner, xp_aggregator, notifier, config):
+    def __init__(self, bot, counter, xp_aggregator, notifier, config):
         self.bot = bot
         self.counter = counter
-        self.cleaner = cleaner
         self.xp_aggregator = xp_aggregator
         self.notifier = notifier
         self.spam_channel = config["spam_channel"]
@@ -33,15 +32,7 @@ class Stats(Cog):
         Computes the stats from previous messages when connecting to a guild
         """
         logger.info("connected to {}".format(guild.name))
-        await self.cleaner.clean_guild(guild)
         await self.counter.add_guild(guild)
-        asyncio.gather(
-            *[
-                self.counter.parse_channel_history(channel)
-                for channel in guild.channels
-                if hasattr(channel, "history")
-            ]
-        )
 
     @Cog.listener()
     async def on_message(self, message):
