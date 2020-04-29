@@ -57,13 +57,11 @@ class XPAggregator:
         logger.debug("Accessing {} for user: {}".format(activity_set, user_id))
         async for activity in self.redis.isscan(activity_set):
             timeframe_hash = activity_set + ":{}".format(activity)
-            logger.debug("Accessing {} for user: {}".format(timeframe_hash, user_id))
 
             xp_count = xp_count + 1
 
             reactions = await self.redis.hget(timeframe_hash, "reactions")
             if reactions:
-                logger.debug("Reaction count: {}".format(int(reactions)))
                 xp_count = xp_count + int(reactions)
 
         return xp_count

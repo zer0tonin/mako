@@ -13,6 +13,8 @@ from mako.stats.counter import Counter
 from mako.stats.xp import XPAggregator
 from mako.stats.notifier import Notifier
 
+from mako.reminder.cog import Reminder
+
 logger = logging.getLogger(__name__)
 
 
@@ -32,6 +34,13 @@ async def start_bot(config):
             Counter(redis),
             XPAggregator(redis, config["levels"]),
             Notifier(redis),
+            config,
+        )
+    )
+    bot.add_cog(
+        Reminder(
+            bot,
+            redis,
             config,
         )
     )

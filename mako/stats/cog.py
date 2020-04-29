@@ -99,7 +99,7 @@ class Stats(Cog):
         raise ValueError("No proper spam channel")
 
     async def notify_levels(self):
-        logger.info("Notify loop")
+        logger.info("Notify loop (Stats)")
         notifications = await self.notifier.notify_guilds()
 
         message_tasks = []
