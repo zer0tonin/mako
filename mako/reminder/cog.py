@@ -29,15 +29,22 @@ class Reminder(Cog):
 
     @command()
     async def remindme(self, ctx, *args):
-        date = dateparser.parse(' '.join(args), languages=['en', 'fr'], settings={'TIMEZONE': 'Europe/Paris'})
+        date = dateparser.parse(
+            " ".join(args),
+            languages=["en", "fr"],
+            settings={"TIMEZONE": "Europe/Paris"},
+        )
         if date is None:
             await ctx.send("Je n'ai pas compris cette date")
             return
-        date = timezone('Europe/Paris').localize(date)
+        date = timezone("Europe/Paris").localize(date)
 
         notification = Notification(ctx.guild.id, ctx.author.id, date).serialize()
         logger.debug("Writing in remind: {}".format(notification))
         await self.redis.lpush("remind", notification)
+        await ctx.send(
+            "Rappel enregistré pour le {}".format(date.strftime("%d/%m/%y %H:%M"))
+        )
 
     def get_bot_channel(self, guild_id):
         guild = self.bot.get_guild(guild_id)
@@ -73,7 +80,11 @@ class Reminder(Cog):
             channel = self.get_bot_channel(int(notification.guild_id))
             user = self.bot.get_user(int(notification.author_id))
             message_tasks.append(
-                asyncio.create_task(channel.send("{} : {}".format(user.mention, "Bip boop c'est l'heure")))
+                asyncio.create_task(
+                    channel.send(
+                        "{} : {}".format(user.mention, "Bip boop c'est l'heure")
+                    )
+                )
             )
 
         asyncio.gather(*message_tasks)

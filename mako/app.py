@@ -37,13 +37,7 @@ async def start_bot(config):
             config,
         )
     )
-    bot.add_cog(
-        Reminder(
-            bot,
-            redis,
-            config,
-        )
-    )
+    bot.add_cog(Reminder(bot, redis, config))
     await bot.start(config["token"])
 
 

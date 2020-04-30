@@ -7,6 +7,7 @@ from pytz import utc
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class Notification:
     guild_id: str
@@ -15,11 +16,11 @@ class Notification:
 
     def serialize(self):
         hm = asdict(self)
-        hm['date'] = hm['date'].astimezone(utc).isoformat()
+        hm["date"] = hm["date"].astimezone(utc).isoformat()
         return json.dumps(hm)
 
     @classmethod
     def deserialize(cls, j):
         hm = json.loads(j)
-        hm['date'] = datetime.fromisoformat(hm['date'])
+        hm["date"] = datetime.fromisoformat(hm["date"])
         return cls(**hm)
