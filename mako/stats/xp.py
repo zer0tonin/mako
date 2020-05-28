@@ -45,6 +45,8 @@ class XPAggregator:
         """
         level_zset = "guilds:{}:levels".format(guild.id)
         level = await self.redis.zscore(level_zset, user_id)
+        if level is None:
+            return (1, self.levels[1])
         return (level, self.levels[level])
 
     async def compute_user_xp(self, user_id, guild_id):
@@ -52,19 +54,12 @@ class XPAggregator:
         Uses the activity timeframe stored in guilds:{}:users:{}:activity to compute XP for a single user
         """
         activity_set = "guilds:{}:users:{}:activity".format(guild_id, user_id)
-        xp_count = 0
-
-        logger.debug("Accessing {} for user: {}".format(activity_set, user_id))
-        async for activity in self.redis.isscan(activity_set):
-            timeframe_hash = activity_set + ":{}".format(activity)
-
-            xp_count = xp_count + 1
-
-            reactions = await self.redis.hget(timeframe_hash, "reactions")
-            if reactions:
-                xp_count = xp_count + int(reactions)
-
-        return xp_count
+        react_value = "guilds:{}:users:{}:reactions".format(guild_id, user_id)
+        activity, reacts = await asyncio.gather(
+            self.redis.scard(activity_set),
+            self.redis.get(react_value),
+        )
+        return activity + int(reacts) if reacts is not None else activity
 
     async def update_guild_xp(self, guild_id):
         """

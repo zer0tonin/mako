@@ -62,35 +62,11 @@ class Counter:
         """
         Increments the reaction count in an activity timeframe in the hash guilds:{}:users:{}:activity:{}
         """
-        creation_minute = message.created_at.strftime("%Y-%m-%dT%H:%M")
-        minute_hash = "guilds:{}:users:{}:activity:{}".format(
-            message.guild.id, message.author.id, creation_minute
-        )
+        react_value = "guilds:{}:users:{}:reactions".format(message.guild.id, message.author.id)
         logger.debug(
-            "Incrementing {} hash for reactions by {}".format(minute_hash, count)
+            "Incrementing {} by {}".format(react_value, count)
         )
-        await self.redis.hincrby(minute_hash, "reactions", count)
-
-    async def decrement_reaction(self, message, count=-1):
-        """
-        Decrements a reaction counter from an activity timeframe if it exists
-        """
-        creation_minute = message.created_at.strftime("%Y-%m-%dT%H:%M")
-        activity_set = "guilds:{}:users:{}:activity".format(
-            message.guild.id, message.author.id
-        )
-        minute_hash = "guilds:{}:users:{}:activity:{}".format(
-            message.guild.id, message.author.id, creation_minute
-        )
-        logger.debug(
-            "Checking {} set for activity {}".format(activity_set, minute_hash)
-        )
-        if (
-            await self.redis.sismember(activity_set, creation_minute)
-            and await self.redis.hget(minute_hash, "reactions") != "0"
-        ):
-            logger.debug("Decrementing {} hash for reactions".format(minute_hash))
-            await self.redis.hincrby(minute_hash, "reactions", count)
+        await self.redis.incrby(react_value, count)
 
     async def decrement_message(self, message):
         """
@@ -131,7 +107,7 @@ class Counter:
         if hasattr(message.author, "id") and not message.author.bot:
             asyncio.gather(
                 self.decrement_message(message),
-                self.decrement_reaction(message, -1 * len(message.reactions)),
+                self.increment_message(message, count=-1 * len(message.reactions)),
             )
 
     async def log_reaction(self, reaction):
@@ -152,7 +128,7 @@ class Counter:
         """
         message = reaction.message
         if hasattr(message.author, "id") and not message.author.bot:
-            await self.decrement_reaction(message)
+            await self.increment_reaction(message, count=-1)
 
     async def log_full_message(self, message):
         """
