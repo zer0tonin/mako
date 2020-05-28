@@ -5,8 +5,8 @@ COMPOSE = docker-compose -p mako
 
 .PHONY: run
 run:
-	$(COMPOSE) build app
-	$(COMPOSE) run app
+	$(COMPOSE) build mako
+	$(COMPOSE) run mako
 
 .PHONY: down
 down:

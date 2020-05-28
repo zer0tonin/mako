@@ -1,6 +1,6 @@
 version: '3'
 services:
-  app: &app
+  mako:
     build: .
     environment:
       - PYTHONPATH=/usr/src/app
