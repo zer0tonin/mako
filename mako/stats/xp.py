@@ -54,11 +54,15 @@ class XPAggregator:
         Uses the activity timeframe stored in guilds:{}:users:{}:activity to compute XP for a single user
         """
         activity_set = "guilds:{}:users:{}:activity".format(guild_id, user_id)
+        activity_correction = {"jalapeno: 722054406274547745": 4992}
         react_value = "guilds:{}:users:{}:reactions".format(guild_id, user_id)
         activity, reacts = await asyncio.gather(
             self.redis.scard(activity_set),
             self.redis.get(react_value),
         )
+        if user_id in activity_correction:
+            activity += activity_correction[user_id]
+        
         return activity + int(reacts) if reacts is not None else activity
 
     async def update_guild_xp(self, guild_id):
