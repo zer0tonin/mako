@@ -32,12 +32,12 @@ class XPAggregator:
 
         return result
 
-    async def get_user_xp(self, user, guild):
+    async def get_user_xp(self, user_id, guild):
         """
         Returns the user xp from the guilds:{}:xp zset
         """
         xp_zset = "guilds:{}:xp".format(guild.id)
-        return await self.redis.zscore(xp_zset, user.id)
+        return await self.redis.zscore(xp_zset, user_id)
 
     async def get_user_level(self, user_id, guild):
         """

@@ -4,6 +4,8 @@ import logging
 from discord.ext.commands import Cog, command
 from discord.ext.tasks import loop
 
+from mako.util import mention_to_id
+
 
 logger = logging.getLogger(__name__)
 
@@ -69,16 +71,12 @@ class Stats(Cog):
         message = message + "\n```"
         return await ctx.send(message)
 
-    @command()
-    async def level(self, ctx, *_):
-        """
-        Level & XP
-        """
+    async def user_level(self, ctx, user_id):
         level_task = asyncio.create_task(
-            self.xp_aggregator.get_user_level(ctx.author.id, ctx.guild)
+            self.xp_aggregator.get_user_level(user_id, ctx.guild)
         )
         xp_task = asyncio.create_task(
-            self.xp_aggregator.get_user_xp(ctx.author, ctx.guild)
+            self.xp_aggregator.get_user_xp(user_id, ctx.guild)
         )
 
         await asyncio.gather(level_task, xp_task)
@@ -86,6 +84,19 @@ class Stats(Cog):
         user_xp = xp_task.result()
 
         await ctx.send("```Level {}: {} ({} XP)```".format(level[0], level[1], user_xp))
+
+    @command()
+    async def level(self, ctx, *args):
+        """
+        Level & XP
+        """
+        if args:
+            user_ids = {mention_to_id(arg) for arg in args}
+        else:
+            user_ids = {ctx.author.id}
+
+        tasks = [asyncio.create_task(self.user_level(ctx, user_id)) for user_id in user_ids]
+        asyncio.gather(*tasks)
 
     async def update_xp(self):
         logger.info("XP loop")
