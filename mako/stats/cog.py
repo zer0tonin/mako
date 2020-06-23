@@ -115,10 +115,13 @@ class Stats(Cog):
 
         message_tasks = []
         for notification in notifications:
-            channel = self.get_bot_channel(int(notification[0]))
-            user = self.bot.get_user(int(notification[1]))
-            message_tasks.append(
-                asyncio.create_task(channel.send("{} level up!".format(user.name)))
-            )
+            try:
+                channel = self.get_bot_channel(int(notification[0]))
+                user = self.bot.get_user(int(notification[1]))
+                message_tasks.append(
+                    asyncio.create_task(channel.send("{} level up!".format(user.name)))
+                )
+            except AttributeError:
+                logger.info("Bad notification encountered")
 
         asyncio.gather(*message_tasks)

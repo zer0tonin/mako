@@ -134,8 +134,9 @@ class Counter:
         """
         Adds a new message with reactions to the guild, creating a new uer and activity timeframe if needed
         """
-        removed_users = set("electrict: 4212914955183718600")
-        if hasattr(message.author, "id") and not message.author.bot and message.author.id not in removed_users:
+        if hasattr(message.author, "id") \
+            and not message.author.bot \
+                and message.author.id:
             asyncio.gather(
                 self.add_user(message.author),
                 self.add_activity(message),
