@@ -65,9 +65,10 @@ class Stats(Cog):
         message = "```"
         for i, line in enumerate(top):
             user = self.bot.get_user(int(line[0]))
-            message = message + "\n{}. {}: Level {} : {} : {} XP".format(
-                i + 1, user.name, line[2], line[3], line[1]
-            )
+            if user is not None:
+                message = message + "\n{}. {}: Level {} : {} : {} XP".format(
+                    i + 1, user.name, line[2], line[3], line[1]
+                )
         message = message + "\n```"
         return await ctx.send(message)
 
@@ -118,9 +119,10 @@ class Stats(Cog):
             try:
                 channel = self.get_bot_channel(int(notification[0]))
                 user = self.bot.get_user(int(notification[1]))
-                message_tasks.append(
-                    asyncio.create_task(channel.send("{} level up!".format(user.name)))
-                )
+                if user is not None:
+                    message_tasks.append(
+                        asyncio.create_task(channel.send("{} level up!".format(user.name)))
+                    )
             except AttributeError:
                 logger.info("Bad notification encountered")
 
