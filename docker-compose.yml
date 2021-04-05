@@ -8,18 +8,9 @@ services:
       - .:/usr/src/app
     depends_on:
       - redis
-    networks:
-      - ns
 
   redis:
     image: redis:5.0.9
     command: redis-server --appendonly yes
     volumes:
       - ./data:/data
-    networks:
-      - ns
-
-networks:
-  ns:
-    external:
-      name: my-network
