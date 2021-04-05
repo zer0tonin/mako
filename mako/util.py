@@ -1,6 +1,6 @@
 import re
 
-mention_regex = re.compile('<@!([0-9]+)>')
+mention_regex = re.compile("<@!([0-9]+)>")
 
 
 def mention_to_id(mention):

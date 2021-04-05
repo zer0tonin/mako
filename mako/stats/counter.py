@@ -62,10 +62,10 @@ class Counter:
         """
         Increments the reaction count in an activity timeframe in the hash guilds:{}:users:{}:activity:{}
         """
-        react_value = "guilds:{}:users:{}:reactions".format(message.guild.id, message.author.id)
-        logger.debug(
-            "Incrementing {} by {}".format(react_value, count)
+        react_value = "guilds:{}:users:{}:reactions".format(
+            message.guild.id, message.author.id
         )
+        logger.debug("Incrementing {} by {}".format(react_value, count))
         await self.redis.incrby(react_value, count)
 
     async def decrement_message(self, message):
@@ -134,9 +134,11 @@ class Counter:
         """
         Adds a new message with reactions to the guild, creating a new uer and activity timeframe if needed
         """
-        if hasattr(message.author, "id") \
-            and not message.author.bot \
-                and message.author.id:
+        if (
+            hasattr(message.author, "id")
+            and not message.author.bot
+            and message.author.id
+        ):
             asyncio.gather(
                 self.add_user(message.author),
                 self.add_activity(message),

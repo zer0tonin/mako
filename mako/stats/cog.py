@@ -96,7 +96,9 @@ class Stats(Cog):
         else:
             user_ids = {ctx.author.id}
 
-        tasks = [asyncio.create_task(self.user_level(ctx, user_id)) for user_id in user_ids]
+        tasks = [
+            asyncio.create_task(self.user_level(ctx, user_id)) for user_id in user_ids
+        ]
         asyncio.gather(*tasks)
 
     async def update_xp(self):
@@ -121,7 +123,9 @@ class Stats(Cog):
                 user = self.bot.get_user(int(notification[1]))
                 if user is not None:
                     message_tasks.append(
-                        asyncio.create_task(channel.send("{} level up!".format(user.name)))
+                        asyncio.create_task(
+                            channel.send("{} level up!".format(user.name))
+                        )
                     )
             except AttributeError:
                 logger.info("Bad notification encountered")
